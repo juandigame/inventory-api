@@ -12,30 +12,49 @@ genera desabastecimiento no detectado y pérdida de ventas.
 
 ## Alcance del MVP
 **Incluye:** CRUD de productos, entradas y salidas de stock, alertas de reabastecimiento
-(stock actual ≤ stock mínimo) e historial de movimientos por producto.
+(stock actual ≤ stock mínimo) e historial/bitácora de movimientos por producto y general.
 **No incluye:** proveedores, facturación/POS, múltiples bodegas.
 
 ## Stack
-Python 3.12 · FastAPI · SQLAlchemy · MySQL 8 · HTML/CSS/JS con Bootstrap 5
-Despliegue: Render (app) · Clever Cloud / Railway (base de datos)
+Python 3.11+ · FastAPI · SQLAlchemy 2 · PostgreSQL / MySQL · HTML/CSS/JS con Bootstrap 5
 
 ## Estructura del repositorio
-- `docs/` documentación y diagramas
-- `poc/` prueba de concepto (su propio README explica qué valida y qué no)
-- `backend/` API REST con FastAPI
-- `frontend/` interfaz web (HTML, CSS y JavaScript)
+- `app/` Backend API REST con FastAPI (`api/`, `services/`, `repositories/`, `models/`, `schemas/`, `core/`)
+- `frontend/` Interfaz web SPA (`index.html`, `css/styles.css`, `js/app.js`) basada en los mockups AVENUE
+- `migrations/` Migraciones de base de datos con Alembic
 
-## Documentación
-- Documento del proyecto: <enlace [a Google Docs](https://docs.google.com/document/d/1tZEDNvzFRlC8dB1_9uhR_n7Gy4cXLfz2aa_CrzRTJp8/edit?usp=sharing)>
-- Backlog y casos de uso: <enlace [a Google Sheets](https://docs.google.com/spreadsheets/d/1C_jGg-3STGPluSnixYa9JC384XM4tP1b/edit?usp=sharing&ouid=102417051153349433992&rtpof=true&sd=true)>
-- Mockups: <enlace [a Figma](https://www.figma.com/make/Sr5qpNLfsaOiDtHOSE4Nli/Sistema-de-Control-de-Inventario?t=3FZHfwTcKhbPNIU3-20&fullscreen=1)>
+## Endpoints principales (`/api`)
+- `GET /api/health` y `GET /api/health/db` — Estado del servidor y conexión a base de datos
+- `GET /api/products` — Listar catálogo de productos
+- `POST /api/products` — Crear un nuevo producto con su stock inicial y mínimo
+- `GET /api/products/{product_id}` — Consultar detalle de un producto
+- `PUT /api/products/{product_id}` — Actualizar nombre, SKU y stock mínimo
+- `DELETE /api/products/{product_id}` — Eliminar producto (solo si no tiene movimientos registrados)
+- `POST /api/movements` — Registrar entrada (`ENTRY`) o salida (`EXIT`) de stock con bloqueo transaccional
+- `GET /api/products/{product_id}/movements` — Consultar historial cronológico de movimientos de un producto
+- `GET /api/movements` — Consultar bitácora general de movimientos (filtros opcionales `product_id` y `type`)
+- `GET /api/alerts` — Listar productos en estado de alerta de reabastecimiento (`current_stock <= minimum_stock`)
 
-## Cómo ejecutar
-Pendiente: se completará al terminar el sprint 1.
+## Cómo ejecutar localmente
 
-## Flujo de trabajo
-Ramas: `main` (estable) ← `develop` (integración) ← `feature/*`.
-Todo cambio entra por Pull Request, nunca directo a `main` ni a `develop`.
+1. Crear y activar entorno virtual e instalar dependencias:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+2. Configurar el archivo `.env` a partir de `.env.example` con tu `DATABASE_URL`.
+3. Ejecutar migraciones con Alembic:
+   ```bash
+   alembic upgrade head
+   ```
+4. Iniciar el servidor de desarrollo:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+5. Abrir en el navegador:
+   - Interfaz Web (SPA): `http://localhost:8000/`
+   - Documentación interactiva Swagger UI: `http://localhost:8000/docs`
 
 ## Equipo
 - Santiago Gomez Ramirez
