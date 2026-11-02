@@ -7,9 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+import app.models  # noqa: F401 - register ORM models on Base.metadata
 from app.api.router import api_router
 from app.core.config import settings
+from app.core.database import Base, engine
 from app.core.errors import register_exception_handlers
+
+if settings.database_url.startswith("sqlite"):
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Inventory API", version="0.1.0")
 

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, String, func
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -17,7 +17,9 @@ class Product(Base):
         CheckConstraint("minimum_stock >= 0", name="ck_products_minimum_stock_non_negative"),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True
+    )
     name: Mapped[str] = mapped_column(String(100))
     sku: Mapped[str] = mapped_column(String(50), unique=True)
     current_stock: Mapped[int] = mapped_column(default=0)

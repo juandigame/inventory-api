@@ -2,7 +2,16 @@
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Index, String, func
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -19,9 +28,12 @@ class Movement(Base):
         Index("ix_movements_product_id_created_at", "product_id", "created_at"),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True
+    )
     product_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("products.id", ondelete="RESTRICT")
+        BigInteger().with_variant(Integer, "sqlite"),
+        ForeignKey("products.id", ondelete="RESTRICT"),
     )
     type: Mapped[str] = mapped_column(String(10))
     quantity: Mapped[int]
